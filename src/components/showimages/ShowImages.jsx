@@ -1,6 +1,7 @@
-import React, { useRef, useState } from "react";
+import React from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/swiper-bundle.min.css"; // Import Swiper styles
+import SwiperCore, { Pagination } from 'swiper';
 
 // Import local images
 import img1 from '../../assets/Show/slide1.png';
@@ -11,6 +12,9 @@ import img5 from '../../assets/Show/slide5.png';
 import img6 from '../../assets/Show/slide6.png';
 import img7 from '../../assets/Show/slide7.png';
 
+// Swiper modules initialization
+SwiperCore.use([Pagination]);
+
 const CarouselComponent = () => {
   const slides = [
     { id: 1, img: img1, title: "DIGESTION" },
@@ -19,47 +23,25 @@ const CarouselComponent = () => {
     { id: 4, img: img4, title: "HEALTHY AGING" },
     { id: 5, img: img5, title: "HAIRLOSS" },
     { id: 6, img: img6, title: "WEIGHT MANAGEMENT" },
-    { id: 7, img: img7, title: "STRESS,SLEEP & FOCUS" },
+    { id: 7, img: img7, title: "WEIGHT MANAGEMENT" },
   ];
 
-  const swiperRef = useRef(null);
-  const [currentIndex, setCurrentIndex] = useState(0);
-
-  const onSlideChange = (swiper) => {
-    setCurrentIndex(swiper.activeIndex);
-  };
-
-  const getBackgroundColor = (index) => {
-    return index % 2 === 0 ? 'bg-red-500' : 'bg-green-500';
-  };
-
-  const slideToPrev = () => {
-    if (swiperRef.current) {
-      swiperRef.current.swiper.slidePrev();
-    }
-  };
-
-  const slideToNext = () => {
-    if (swiperRef.current) {
-      swiperRef.current.swiper.slideNext();
-    }
-  };
-
   return (
-    <div className="relative w-full mt-12 overflow-hidden">
+    <div className="relative w-full mt-12 overflow-hidden" style={{ backgroundColor: '#e0f7fa' }}> {/* Light blue background */}
       <h2 className="text-3xl font-bold text-center mb-6">
         Tackle Your Biggest Worries This Month
       </h2>
 
       <Swiper
-        ref={swiperRef}
-        className="swiper-container"
-        spaceBetween={20}
-        slidesPerView={4}
-        onSlideChange={onSlideChange}
-        loop={false}
-        speed={600}
+        spaceBetween={15} // Space between slides
+        slidesPerView={4}  // Show 4 images by default
+        pagination={{ clickable: true }} // Enable pagination
+        loop={true} // Enable infinite looping
         breakpoints={{
+          320: {
+            slidesPerView: 1,
+            centeredSlides: true,
+          },
           640: {
             slidesPerView: 3,
           },
@@ -68,43 +50,27 @@ const CarouselComponent = () => {
           },
         }}
       >
-        {slides.map((slide, index) => (
+        {slides.map((slide) => (
           <SwiperSlide key={slide.id}>
-            <div className={`flex flex-col items-center transition-transform duration-300 transform hover:scale-105 shadow-lg`}>
-              {/* Image with Margin and Shadow */}
-              <img
-                src={slide.img}
-                alt={slide.title}
-                className="w-full h-64 object-cover:contain m-4 shadow-md rounded-lg"
-              />
-              {/* Title Background with Alternating Color and Maximum Rounded Bottom Corners */}
-              <div className={`w-full p-6 text-white text-center h-24 flex items-center justify-center ${getBackgroundColor(index)} text-xl font-bold rounded-b-3xl`}>
-                {slide.title}
+            <div className="flex flex-col items-center bg-white rounded-lg shadow-md overflow-hidden mx-2" style={{ backgroundColor: '#e0f7fa' }}>
+              {/* Image */}
+              <div className="w-full h-64 p-2 flex items-center justify-center bg-white"> {/* Ensure background is white to see the effect */}
+                <img
+                  src={slide.img}
+                  alt={slide.title}
+                  className="w-full h-full object-contain" // Keep this for better scaling
+                  style={{ backgroundColor: 'transparent' }} // Set transparent background for the image
+                />
+              </div>
+              
+              {/* Title */}
+              <div className="p-4 bg-gray-800 text-white w-full text-center">
+                <h3 className="text-lg font-semibold">{slide.title}</h3>
               </div>
             </div>
           </SwiperSlide>
         ))}
       </Swiper>
-
-      {/* Left Arrow Button */}
-      {currentIndex > 0 && (
-        <button
-          className="absolute z-50 top-1/2 left-4 transform -translate-y-1/2 text-2xl text-white bg-blue-500 hover:bg-blue-600 p-2 rounded-full"
-          onClick={slideToPrev}
-        >
-          &#10094; {/* HTML Entity for left arrow */}
-        </button>
-      )}
-
-      {/* Right Arrow Button */}
-      {currentIndex < slides.length - 1 && (
-        <button
-          className="absolute z-50 top-1/2 right-4 transform -translate-y-1/2 text-2xl text-white bg-blue-500 hover:bg-blue-600 p-2 rounded-full"
-          onClick={slideToNext}
-        >
-          &#10095; {/* HTML Entity for right arrow */}
-        </button>
-      )}
     </div>
   );
 };
