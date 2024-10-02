@@ -1,4 +1,4 @@
-import React, { useEffect, useState, Suspense, lazy } from "react";
+import React, { useEffect, useState, Suspense, lazy, useRef } from "react";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -14,9 +14,13 @@ const ProductCart = ({ category }) => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [currentIndex, setCurrentIndex] = useState(0);  // Track current slide index
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [currentIndex, setCurrentIndex] = useState(0); // Track the current slide index
+  const sliderRef = useRef(null); // Create a ref for the slider instance
+
+
+
 
   const fetchProducts = async () => {
     setLoading(true);
@@ -30,6 +34,8 @@ const ProductCart = ({ category }) => {
         ...doc.data()
       }));
       setProducts(allProducts);
+      
+      
     } catch (error) {
       console.error("Error fetching products:", error.message);
       setError("Failed to load products");
@@ -39,8 +45,17 @@ const ProductCart = ({ category }) => {
   };
 
   useEffect(() => {
+   
+    
     fetchProducts();
+    
   }, [category]);
+  useEffect(() => {
+    if (sliderRef.current) {
+      sliderRef.current.slickGoTo(0); // Move to the first slide after loading
+    }
+  }, [products]);
+
 
   const handleAddToCart = (product) => {
     const productToAdd = {
@@ -56,59 +71,55 @@ const ProductCart = ({ category }) => {
 
   // Custom arrow components with dynamic visibility
   const NextArrow = ({ onClick }) => (
-    currentIndex < products.length - 1 && ( // Show next arrow only if not on the last slide
-      <div
-        className="absolute top-1/2 right-2 transform -translate-y-1/2 z-10 cursor-pointer bg-white rounded-full p-1 shadow-md"
-        onClick={onClick}
-      >
-        <span className="text-gray-800">→</span>
-      </div>
-    )
+    <div
+      className={`absolute top-1/2 right-4 transform -translate-y-1/2 z-10 cursor-pointer ${currentIndex === products.length - 4 ? 'hidden' : ''}`}
+      onClick={onClick}
+    >
+      <button className="bg-blue-500 p-2 rounded-full text-white">→</button>
+    </div>
   );
 
   const PrevArrow = ({ onClick }) => (
-    currentIndex > 0 && ( // Show previous arrow only if not on the first slide
-      <div
-        className="absolute top-1/2 left-2 transform -translate-y-1/2 z-10 cursor-pointer bg-white rounded-full p-1 shadow-md"
-        onClick={onClick}
-      >
-        <span className="text-gray-800">←</span>
-      </div>
-    )
+    <div
+      className={`absolute top-1/2 left-4 transform -translate-y-1/2 z-10 cursor-pointer ${currentIndex === 0 ? 'hidden' : ''}`}
+      onClick={onClick}
+    >
+      <button className="bg-blue-500 p-2 rounded-full text-white">←</button>
+    </div>
   );
 
   const settings = {
     dots: false,
-    infinite: false, // Change to false for controlled navigation
+    infinite: false,
     speed: 500,
-    slidesToShow: 1, // Start with 1 item on mobile
+    slidesToShow: 4,
     slidesToScroll: 1,
     nextArrow: <NextArrow />,
     prevArrow: <PrevArrow />,
-    afterChange: (current) => setCurrentIndex(current), // Update currentIndex after slide change
+    afterChange: (current) => setCurrentIndex(current),  // Update currentIndex after slide change
     responsive: [
       {
-        breakpoint: 640,
+        breakpoint: 1280,
         settings: {
-          slidesToShow: 1, // Show 1 item on mobile
-        },
-      },
-      {
-        breakpoint: 768,
-        settings: {
-          slidesToShow: 2, // Show 2 items on tablets
+          slidesToShow: 4,
         },
       },
       {
         breakpoint: 1024,
         settings: {
-          slidesToShow: 3, // Show 3 items on larger screens
+          slidesToShow: 3,
         },
       },
       {
-        breakpoint: 1280,
+        breakpoint: 768,
         settings: {
-          slidesToShow: 4, // Show 4 items on large screens
+          slidesToShow: 2,
+        },
+      },
+      {
+        breakpoint: 640,
+        settings: {
+          slidesToShow: 1,
         },
       },
     ],
@@ -134,13 +145,12 @@ const ProductCart = ({ category }) => {
         <p>No products available for category {category}</p>
       ) : (
         <Suspense fallback={<div>Loading...</div>}>
-          <Slider {...settings}>
+          <Slider {...settings} ref={sliderRef}> {/* Attach ref to Slider */}
             {products.map((product) => (
-              <div key={product.id} className="p-2">
+              <div key={product.id} className="p-4">
                 <ProductCard
                   product={product}
                   onAddToCart={() => handleAddToCart(product)}
-                  onClick={() => handleProductClick(product.id)} // Make the whole card clickable
                 />
               </div>
             ))}
