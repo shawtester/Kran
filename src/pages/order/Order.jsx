@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { fireDB } from "../../firebase/FirebaseConfig"; // Ensure correct import path
+import Layout from '../../components/layout/Layout';
 
 const OrdersComponent = () => {
   const [orders, setOrders] = useState([]);
@@ -81,6 +82,7 @@ const OrdersComponent = () => {
   };
 
   return (
+    <Layout>
     <div className="min-h-screen flex items-center justify-center py-10 px-4 sm:px-6 lg:px-8 bg-gray-100">
       {loading ? (
         <p className="text-center text-gray-600 text-lg">Loading...</p>
@@ -141,6 +143,7 @@ const OrdersComponent = () => {
         </div>
       )}
     </div>
+    </Layout>
   );
 };
 

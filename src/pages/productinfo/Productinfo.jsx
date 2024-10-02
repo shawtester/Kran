@@ -12,8 +12,8 @@ function ProductInfo() {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [quantity, setQuantity] = useState(1);
-  const [selectedWeight, setSelectedWeight] = useState(null);
-  const [selectedFlavor, setSelectedFlavor] = useState(null);
+  const [selectedWeight, setSelectedWeight] = useState(localStorage.getItem(`selectedWeight-${id}`) || null);
+  const [selectedFlavor, setSelectedFlavor] = useState(localStorage.getItem(`selectedFlavor-${id}`) || null);
   const [mainImage, setMainImage] = useState(null); // State to hold the main image
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -27,8 +27,16 @@ function ProductInfo() {
           const productData = docSnap.data();
           setProduct(productData);
           setMainImage(productData.imageUrls[0]); // Set the first image as the main image initially
-          setSelectedWeight(productData.weight1);
-          setSelectedFlavor(productData.flavour1);
+
+          // Only set the initial weight and flavor if none is selected
+          if (!selectedWeight) {
+            setSelectedWeight(productData.weight1);
+            localStorage.setItem(`selectedWeight-${id}`, productData.weight1);
+          }
+          if (!selectedFlavor) {
+            setSelectedFlavor(productData.flavour1);
+            localStorage.setItem(`selectedFlavor-${id}`, productData.flavour1);
+          }
         } else {
           console.log(`Product with ID ${id} does not exist.`);
         }
@@ -37,7 +45,7 @@ function ProductInfo() {
       }
     };
     fetchProduct();
-  }, [id]);
+  }, [id, selectedWeight, selectedFlavor]);
 
   const handleAddToCart = () => {
     if (product && selectedWeight && selectedFlavor) {
@@ -52,6 +60,16 @@ function ProductInfo() {
     }
   };
 
+  const handleWeightSelect = (weight) => {
+    setSelectedWeight(weight);
+    localStorage.setItem(`selectedWeight-${id}`, weight); // Save selected weight to localStorage
+  };
+
+  const handleFlavorSelect = (flavor) => {
+    setSelectedFlavor(flavor);
+    localStorage.setItem(`selectedFlavor-${id}`, flavor); // Save selected flavor to localStorage
+  };
+
   const handleImageClick = (image) => {
     setMainImage(image); // Set the clicked thumbnail image as the main image
   };
@@ -61,6 +79,14 @@ function ProductInfo() {
     productInfo: "This is a high-quality product designed for fitness enthusiasts. It includes essential nutrients and vitamins.",
     additionalInfo: "For best results, use in conjunction with a balanced diet and regular exercise.",
     manufacturerInfo: "Manufactured by XYZ Company, known for its commitment to quality and customer satisfaction.",
+  };
+
+  const increaseQuantity = () => {
+    setQuantity((prev) => prev + 1);
+  };
+
+  const decreaseQuantity = () => {
+    setQuantity((prev) => (prev > 1 ? prev - 1 : 1)); // Prevent going below 1
   };
 
   if (!product) return <p>Loading...</p>;
@@ -83,21 +109,23 @@ function ProductInfo() {
             {/* Left Side with Main Image and Thumbnails */}
             <div className="md:w-1/2 w-full flex">
               <div className="flex flex-col space-y-2 mr-4">
-                {product.imageUrls?.map((image, index) => (
-                  <img
-                    key={index}
-                    src={image}
-                    alt={`Product Image ${index + 1}`}
-                    className="object-cover w-32 h-32 cursor-pointer"
-                    onClick={() => handleImageClick(image)} // Handle click event
-                  />
-                ))}
+                <div className="border rounded-md p-2">
+                  {product.imageUrls?.map((image, index) => (
+                    <img
+                      key={index}
+                      src={image}
+                      alt={`Product Image ${index + 1}`}
+                      className="object-cover:conatin w-48 h-32 cursor-pointer mb-2" // Added mb-2 for spacing
+                      onClick={() => handleImageClick(image)} // Handle click event
+                    />
+                  ))}
+                </div>
               </div>
               <div className="relative w-full h-96 max-w-lg overflow-hidden">
                 <img
                   src={mainImage} // Use the selected main image
                   alt={product.title}
-                  className="object-contain w-full h-full absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+                  className="object-cover:contain w-full h-full absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
                 />
               </div>
             </div>
@@ -122,7 +150,7 @@ function ProductInfo() {
                 <div className="flex space-x-2">
                   {product.weight1 && (
                     <button
-                      onClick={() => setSelectedWeight(product.weight1)}
+                      onClick={() => handleWeightSelect(product.weight1)}
                       className={`px-4 py-2 rounded ${selectedWeight === product.weight1 ? 'bg-indigo-500 text-white' : 'bg-gray-200 text-gray-700'}`}
                     >
                       {product.weight1}
@@ -130,7 +158,7 @@ function ProductInfo() {
                   )}
                   {product.weight2 && (
                     <button
-                      onClick={() => setSelectedWeight(product.weight2)}
+                      onClick={() => handleWeightSelect(product.weight2)}
                       className={`px-4 py-2 rounded ${selectedWeight === product.weight2 ? 'bg-indigo-500 text-white' : 'bg-gray-200 text-gray-700'}`}
                     >
                       {product.weight2}
@@ -145,7 +173,7 @@ function ProductInfo() {
                 <div className="flex space-x-2">
                   {product.flavour1 && (
                     <button
-                      onClick={() => setSelectedFlavor(product.flavour1)}
+                      onClick={() => handleFlavorSelect(product.flavour1)}
                       className={`px-4 py-2 rounded ${selectedFlavor === product.flavour1 ? 'bg-indigo-500 text-white' : 'bg-gray-200 text-gray-700'}`}
                     >
                       {product.flavour1}
@@ -153,7 +181,7 @@ function ProductInfo() {
                   )}
                   {product.flavour2 && (
                     <button
-                      onClick={() => setSelectedFlavor(product.flavour2)}
+                      onClick={() => handleFlavorSelect(product.flavour2)}
                       className={`px-4 py-2 rounded ${selectedFlavor === product.flavour2 ? 'bg-indigo-500 text-white' : 'bg-gray-200 text-gray-700'}`}
                     >
                       {product.flavour2}
@@ -162,43 +190,52 @@ function ProductInfo() {
                 </div>
               </div>
 
+              {/* Quantity Control */}
+              <div className="flex items-center mb-4">
+                <button
+                  onClick={decreaseQuantity}
+                  className="border px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-200"
+                >
+                  -
+                </button>
+                <span className="mx-4 text-lg">{quantity}</span>
+                <button
+                  onClick={increaseQuantity}
+                  className="border px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-200"
+                >
+                  +
+                </button>
+              </div>
+
+              {/* Add to Cart Button */}
               <button
                 onClick={handleAddToCart}
-                className="flex ml-auto text-white bg-indigo-500 border-0 py-2 px-6 focus:outline-none hover:bg-indigo-600 rounded"
+                className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700"
               >
                 Add To Cart
               </button>
-            </div>
-          </div>
 
-          {/* Additional Sections with Icons */}
-          <div className="mt-4">
-            <div className="flex items-start mb-5">
-              <AiOutlineTool className="text-indigo-600 text-2xl md:text-3xl mr-4" />
-              <div>
-                <h3 className="text-lg font-medium text-gray-700">How to Use</h3>
-                <p className="mt-3 text-gray-500 text-sm md:text-base">{staticData.howToUse}</p>
-              </div>
-            </div>
-            <div className="flex items-start mb-5">
-              <AiOutlineInfoCircle className="text-indigo-600 text-2xl md:text-3xl mr-4" />
-              <div>
-                <h3 className="text-lg font-medium text-gray-700">Product Information</h3>
-                <p className="mt-3 text-gray-500 text-sm md:text-base">{staticData.productInfo}</p>
-              </div>
-            </div>
-            <div className="flex items-start mb-5">
-              <AiOutlineFileText className="text-indigo-600 text-2xl md:text-3xl mr-4" />
-              <div>
-                <h3 className="text-lg font-medium text-gray-700">Additional Information</h3>
-                <p className="mt-3 text-gray-500 text-sm md:text-base">{staticData.additionalInfo}</p>
-              </div>
-            </div>
-            <div className="flex items-start mb-5">
-              <GiFactory className="text-indigo-600 text-2xl md:text-3xl mr-4" />
-              <div>
-                <h3 className="text-lg font-medium text-gray-700">Manufacturer Info</h3>
-                <p className="mt-3 text-gray-500 text-sm md:text-base">{staticData.manufacturerInfo}</p>
+              {/* Additional Product Info Sections */}
+              <div className="mt-6">
+                <h3 className="text-lg font-medium text-gray-700 flex items-center">
+                  <AiOutlineTool className="mr-2" /> How to Use
+                </h3>
+                <p className="text-gray-600">{staticData.howToUse}</p>
+
+                <h3 className="text-lg font-medium text-gray-700 flex items-center mt-4">
+                  <AiOutlineInfoCircle className="mr-2" /> Product Information
+                </h3>
+                <p className="text-gray-600">{staticData.productInfo}</p>
+
+                <h3 className="text-lg font-medium text-gray-700 flex items-center mt-4">
+                  <AiOutlineFileText className="mr-2" /> Additional Information
+                </h3>
+                <p className="text-gray-600">{staticData.additionalInfo}</p>
+
+                <h3 className="text-lg font-medium text-gray-700 flex items-center mt-4">
+                  <GiFactory className="mr-2" /> Manufacturer Info
+                </h3>
+                <p className="text-gray-600">{staticData.manufacturerInfo}</p>
               </div>
             </div>
           </div>

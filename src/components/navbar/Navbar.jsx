@@ -1,30 +1,45 @@
 import React, { Fragment, useContext, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FaShoppingCart, FaSearch } from 'react-icons/fa';
 import { useSelector } from 'react-redux';
 import { BsFillCloudSunFill } from 'react-icons/bs';
 import myContext from '../../context/data/myContext';
 import R1 from '../../assets/Images/R1.jpg';
 
+
+
+
+
+
+
+
+
+
 export default function Navbar() {
   const [open, setOpen] = useState(false);
+  const [categoriesOpen, setCategoriesOpen] = useState(false);
   const context = useContext(myContext);
   const { toggleMode, mode } = context;
   const user = JSON.parse(localStorage.getItem('user'));
 
-  // Get total cart items from Redux
   const cartItems = useSelector((state) => state.cart.cartItems);
   const totalItems = cartItems.reduce((acc, item) => acc + item.quantity, 0);
+
+  const navigate = useNavigate();
 
   const logout = () => {
     localStorage.removeItem('user');
     window.location.href = "/";
   };
 
+  const handleNavigateAndClose = (path) => {
+    setOpen(false);
+    navigate(path);
+  };
+
   return (
     <div className="w-full relative">
-      {/* Mobile menu */}
       <Transition.Root show={open} as={Fragment}>
         <Dialog as="div" className="relative z-40 lg:hidden" onClose={setOpen}>
           <Transition.Child
@@ -56,29 +71,106 @@ export default function Navbar() {
                     className="ml-auto bg-white rounded-md p-2 inline-flex items-center justify-center text-gray-400"
                     onClick={() => setOpen(false)}
                   >
-                    <span className="sr-only">Close menu</span>
+                    <span className="text-gray-700 block hover:text-red-500 font-bold transition duration-300"> Close menu</span>
                     ✖
                   </button>
                 </div>
                 <div className="mt-6 px-4">
                   <nav className="space-y-6">
-                    <Link to="/order" className="text-gray-700 block">
+                    <button
+                      onClick={() => handleNavigateAndClose('/')}
+                      className="text-gray-700 block text-left w-full hover:text-red-500 font-bold transition duration-300"
+                    >
+                      Home
+                    </button>
+
+                    <Link
+                      to="/order"
+                      className="text-gray-700 block hover:text-red-500 font-bold transition duration-300"
+                    >
                       Order
                     </Link>
+                    <Link
+                      to="/about"
+                      className="text-gray-700 block hover:text-red-500 font-bold transition duration-300"
+                    >
+                      About
+                    </Link>
+                   <Link to="/certificate"  className="text-gray-700 block hover:text-red-500 font-bold transition duration-300"  state={{ fromLink: true }}>View Certificate's</Link>
+                    <Link
+                      to="/contact"
+                      className="text-gray-700 block hover:text-red-500 font-bold transition duration-300"
+                    >
+                      Help & Support 
+                    </Link>
+
+
                     {user?.user?.email === 'aman05cmj@gmail.com' && (
-                      <Link to="/dashboard" className="text-gray-700 block">
+                      <Link
+                        to="/dashboard"
+                        className="text-gray-700 block hover:text-red-500 font-bold transition duration-300"
+                      >
                         Admin
                       </Link>
                     )}
+
+                    <button
+                      className="flex justify-between items-center w-full text-gray-700 hover:text-red-500 font-bold transition duration-300"
+                      onClick={() => setCategoriesOpen(!categoriesOpen)}
+                    >
+                      Shop By Category
+                      <span className="ml-2">
+                        {categoriesOpen ? '▼' : '▶'}
+                      </span>
+                    </button>
+
+                    {categoriesOpen && (
+                      <div className="pl-4 space-y-2">
+                        <Link
+                          to="/category/Whey"
+                          className="text-gray-600 block hover:text-red-500 transition duration-300 font-bold"
+                        >
+                          Whey Protein
+                        </Link>
+                        <Link
+                          to="/category/Isolated"
+                          className="text-gray-600 block hover:text-red-500 transition duration-300 font-bold"
+                        >
+                          Whey Isolated
+                        </Link>
+                        <Link
+                          to="/category/Gainers"
+                          className="text-gray-600 block hover:text-red-500 transition duration-300 font-bold"
+                        >
+                          Gainers
+                        </Link>
+                        <Link
+                          to="/category/Creatine"
+                          className="text-gray-600 block hover:text-red-500 transition duration-300 font-bold"
+                        >
+                          Creatine
+                        </Link>
+                        <Link
+                          to="/category/Omega3"
+                          className="text-gray-600 block hover:text-red-500 transition duration-300 font-bold"
+                        >
+                          Omega3
+                        </Link>
+                      </div>
+                    )}
+
                     {user ? (
                       <a
                         onClick={logout}
-                        className="text-gray-700 block cursor-pointer"
+                        className="text-gray-700 block hover:text-red-500 transition duration-300 font-bold cursor-pointer"
                       >
                         Logout
                       </a>
                     ) : (
-                      <Link to="/signup" className="text-gray-700 block">
+                      <Link
+                        to="/signup"
+                        className="text-gray-700 block hover:text-red-500 transition duration-300 font-bold"
+                      >
                         Signup
                       </Link>
                     )}
@@ -90,18 +182,16 @@ export default function Navbar() {
         </Dialog>
       </Transition.Root>
 
-      {/* Desktop */}
       <header className="relative bg-white shadow">
-      <p
-  className="flex h-10 items-center justify-center px-4 text-sm font-medium text-white sm:px-6 lg:px-8"
-  style={{
-    backgroundColor: mode === 'dark' ? '#FF6347' : '#F87171',
-    color: mode === 'dark' ? 'white' : '',
-  }}
->
-  Get free delivery on orders over ₹300
-</p>
-
+        <p
+          className="flex h-10 items-center justify-center px-4 text-sm font-medium text-white sm:px-6 lg:px-8"
+          style={{
+            backgroundColor: mode === 'dark' ? '#FF6347' : '#F87171',
+            color: mode === 'dark' ? 'white' : '',
+          }}
+        >
+          Get free delivery on orders over ₹300
+        </p>
 
         <nav
           aria-label="Top"
@@ -112,7 +202,6 @@ export default function Navbar() {
           }}
         >
           <div className="flex h-16 items-center justify-between">
-            {/* Mobile menu button */}
             <div className="flex items-center lg:hidden">
               <button
                 type="button"
@@ -123,10 +212,8 @@ export default function Navbar() {
               </button>
             </div>
 
-            {/* Logo and Title */}
             <div className="flex flex-grow items-center justify-center lg:justify-start">
               <div className="flex items-center">
-                {/* Logo */}
                 <div className="w-auto flex justify-center">
                   <img
                     src={R1}
@@ -134,7 +221,6 @@ export default function Navbar() {
                     className="h-auto max-h-8 sm:max-h-10 md:max-h-12 lg:max-h-14 xl:max-h-16 w-auto max-w-full mx-2 object-contain"
                   />
                 </div>
-                {/* Title */}
                 <Link to={'/'} className="flex items-center ml-4">
                   <h1
                     className="text-lg sm:text-xl md:text-2xl font-bold px-2 py-1 rounded whitespace-nowrap"
@@ -147,22 +233,36 @@ export default function Navbar() {
               </div>
             </div>
 
-            {/* Actions */}
             <div className="ml-auto flex items-center space-x-4 lg:space-x-6">
-              {/* Desktop links */}
               <div className="hidden lg:flex items-center space-x-4">
+              <Link
+                      to="/about"
+                      className="text-gray-700 block hover:text-red-500 font-bold transition duration-300"
+                    >
+                      About
+                    </Link>
+                 
+              
+
+
+<Link to="/certificate" className="text-gray-700 block hover:text-red-500 font-bold transition duration-300" state={{ fromLink: true }}>
+  View Certificates
+</Link>
+
                 <Link
                   to={'/order'}
-                  className="text-sm font-medium pt-4 lg:pt-0"
+                  className="text-gray-700 block hover:text-red-500 font-bold transition duration-300"
                   style={{ color: mode === 'dark' ? 'white' : '' }}
                 >
                   Order
                 </Link>
+                
+                 
 
                 {user?.user?.email === 'aman05cmj@gmail.com' && (
                   <Link
                     to={'/dashboard'}
-                    className="text-sm font-medium pt-4 lg:pt-0"
+                    className="text-gray-700 block hover:text-red-500 font-bold transition duration-300"
                     style={{ color: mode === 'dark' ? 'white' : '' }}
                   >
                     Admin
@@ -172,7 +272,7 @@ export default function Navbar() {
                 {user ? (
                   <a
                     onClick={logout}
-                    className="text-sm font-medium cursor-pointer pt-4 lg:pt-0"
+                    className="text-gray-700 block hover:text-red-500 font-bold transition duration-300"
                     style={{ color: mode === 'dark' ? 'white' : '' }}
                   >
                     Logout
@@ -180,7 +280,7 @@ export default function Navbar() {
                 ) : (
                   <Link
                     to={'/signup'}
-                    className="text-sm font-medium pt-4 lg:pt-0"
+                    className="text-sm font-medium pt-4 lg:pt-0 hover:text-red-500 transition duration-300 font-bold"
                     style={{ color: mode === 'dark' ? 'white' : '' }}
                   >
                     Signup
@@ -188,30 +288,30 @@ export default function Navbar() {
                 )}
               </div>
 
-              {/* Search Icon */}
-              <Link to="/search" className="text-gray-700 hover:text-gray-800 pt-4 lg:pt-0">
-                <FaSearch size={24} style={{ color: mode === 'dark' ? 'white' : '' }} />
-              </Link>
+              <button
+                className="relative text-gray-700 hover:text-red-500 transition duration-300 font-bold"
+                onClick={toggleMode}
+              >
+                <BsFillCloudSunFill size={24} />
+              </button>
 
-              {/* Cart */}
-              <Link to={'/cart'} className="relative text-gray-700 hover:text-gray-800 pt-4 lg:pt-0">
-                <FaShoppingCart size={24} style={{ color: mode === 'dark' ? 'white' : '' }} />
-                {totalItems > 0 && (
-                  <span className="absolute top-0 right-0 rounded-full bg-red-600 text-white text-xs font-bold px-2 py-1">
-                    {totalItems}
-                  </span>
-                )}
-              </Link>
+              <button
+                className="relative text-gray-700 hover:text-red-500 transition duration-300 font-bold"
+                onClick={() => navigate('/cart')}
+              >
+                <FaShoppingCart size={24} />
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full px-1">
+                  {totalItems}
+                </span>
+              </button>
 
-              {/* Dark/Light mode toggle */}
-              <div className="flex-shrink-0">
-                <BsFillCloudSunFill
-                  onClick={toggleMode}
-                  className="inline-block text-black bg-white shadow-2xl rounded-full mx-2 pt-4 lg:pt-0"
-                  style={{ color: mode === 'dark' ? 'white' : '' }}
-                  size={30}
-                />
-              </div>
+              <Link
+                to={'/search'}
+                className="text-gray-700 hover:text-red-500 transition duration-300 font-bold"
+              >
+                <FaSearch size={24} />
+              </Link>
+              
             </div>
           </div>
         </nav>

@@ -3,11 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import './CarouselA.css'; // Import your custom styles here
 
 // Import local images
-import Category1 from '../../assets/Images/Category1.jpg';  // Update the image paths accordingly
-import Category2 from '../../assets/Images/Category2.jpg';
-import Category3 from '../../assets/Images/Category3.jpg'; 
-import Category4 from '../../assets/Images/Category4.jpg'; 
-import Category5 from '../../assets/Images/Category5.jpg'; 
+import Category1 from '../../assets/Images/Category1.png';  // Update the image paths accordingly
+import Category2 from '../../assets/Images/Category2.png';
+import Category3 from '../../assets/Images/Category3.png'; 
+import Category4 from '../../assets/Images/Category4.png'; 
+import Category5 from '../../assets/Images/Category5.png'; 
+import Category6 from '../../assets/Images/Category6.png'; 
+import Category7 from '../../assets/Images/Category7.png'; 
+
 
 const MiniCarousel = () => {
   const navigate = useNavigate();
@@ -36,6 +39,8 @@ const MiniCarousel = () => {
     { id: 3, name: 'Gainers', imageUrl:Category5},
     { id: 4, name: 'Creatine', imageUrl:Category4},
     { id: 5, name: 'Pre-Workout',imageUrl:Category3},
+    { id: 6, name: 'Omega3',imageUrl:Category6},
+    { id: 7, name: 'BCAA',imageUrl:Category7},
   ];
 
   const handleCardClick = (categoryName) => {
@@ -47,6 +52,7 @@ const MiniCarousel = () => {
   return (
     <div className="carousel-containerr">
       <div className="carousel-wrapper">
+ 
         {categories.map((category) => (
           <div
             key={category.id}

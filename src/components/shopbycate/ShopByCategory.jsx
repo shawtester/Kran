@@ -4,11 +4,11 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from 'swiper';
 import 'swiper/swiper-bundle.min.css'; // Use the bundled CSS file
 import { Link } from 'react-router-dom';
-import CategoryImage1 from '../../assets/Images/Category1.jpg'; // Import local images
-import CategoryImage2 from '../../assets/Images/Category2.jpg';
-import CategoryImage3 from '../../assets/Images/Category3.jpg';
-import CategoryImage4 from '../../assets/Images/Category4.jpg';
-import CategoryImage5 from '../../assets/Images/Category5.jpg';
+import CategoryImage1 from '../../assets/Images/Category1.png'; // Import local images
+import CategoryImage2 from '../../assets/Images/Category2.png';
+import CategoryImage3 from '../../assets/Images/Category3.png';
+import CategoryImage4 from '../../assets/Images/Category4.png';
+import CategoryImage5 from '../../assets/Images/Category5.png';
 
 const categories = [
   {

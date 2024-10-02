@@ -37,7 +37,8 @@ import 'slick-carousel/slick/slick-theme.css';
 import VerticalCategoryPage from './pages/category/VerticalCategoryPage';
 import Testimonial from './components/testimonial/Testimonial';
 import Certificate from './components/certificate/Certificate';
-import Temp01 from './components/Temo01';
+import StickyPhone from './components/phonenumber/StickyPhone';
+
 
 
 
@@ -84,7 +85,7 @@ const App = () => {
 <Route path="/product/:id" element={<Productinfo />} />
 <Route path='/showimges' element={<ShowImges/>}/>
 <Route path="/category/:categoryName" element={<CategoryPage />} />
-<Route path='/temp01' element={<Temp01 />}/>
+
 <Route path="/category/:categoryName/vertical" element={<VerticalCategoryPage />} />
 
 <Route path="/category/:categoryName/products" element={<ProductCart />} />
@@ -96,6 +97,7 @@ const App = () => {
 
        
       </Routes>
+      <StickyPhone/>
       <ToastContainer/>
    
     </Router>

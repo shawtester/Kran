@@ -138,7 +138,7 @@ function Cart() {
             ) : (
               cartItems.map((item, index) => (
                 <div key={index} className={`mb-6 rounded-lg border drop-shadow-xl p-6 sm:flex sm:justify-start ${mode === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
-                  <img src={item.imageUrl || 'https://dummyimage.com/400x400'} alt={item.title} className="w-full rounded-lg sm:w-40" />
+                  <img src={item.imageUrls[0] || 'https://dummyimage.com/400x400'} alt={item.title} className="w-full rounded-lg sm:w-40" />
                   <div className="sm:ml-4 sm:flex sm:w-full sm:justify-between">
                     <div className="mt-5 sm:mt-0">
                       <h2 className="text-lg font-bold">{item.title}</h2>

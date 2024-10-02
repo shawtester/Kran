@@ -91,12 +91,12 @@ function DashboardTab() {
                                 </thead>
                                 <tbody>
                                     {product.map((item, index) => {
-                                        const { title, price1, price2, weight1, weight2, imageUrl, category, date, flavour1, flavour2 } = item;
+                                        const { title, price1, price2, weight1, weight2, imageUrls, category, date, flavour1, flavour2 } = item;
                                         return (
                                             <tr className="bg-gray-50 border-b dark:border-gray-700" style={{ backgroundColor: mode === 'dark' ? 'rgb(46 49 55)' : '', color: mode === 'dark' ? 'white' : '' }} key={index}>
                                                 <td className="px-6 py-4">{index + 1}.</td>
                                                 <th className="px-6 py-4 font-medium">
-                                                    <img className="w-16" src={imageUrl} alt="Product" />
+                                                    <img className="w-16" src={imageUrls[0]} alt="Product" />
                                                 </th>
                                                 <td className="px-6 py-4">{title}</td>
                                                 <td className="px-6 py-4">₹{price1}</td>

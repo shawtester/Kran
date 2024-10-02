@@ -39,6 +39,30 @@ const TestimonialPage = () => {
       name: 'Rajesh Kumar',
       message: "Supplement Adda has been my go-to for all my fitness needs. Their wide range of products and excellent customer service make them stand out from the rest. I highly recommend them to anyone serious about their health and fitness journey.",
     },
+    {
+      name: 'Ravi Mehta',
+      message: "I've tried various supplement companies, but none compare to Supplement Adda. Their products are top-notch and have made a significant difference in my fitness journey. The delivery was quick, and the support team was incredibly helpful. Highly recommended!",
+    },
+    {
+      name: 'Neha Verma',
+      message: "Supplement Adda has truly transformed my approach to fitness. The quality of their supplements is outstanding, and the user-friendly website made ordering a breeze. I'm extremely satisfied with my purchases and will continue to shop here.",
+    },
+    {
+      name: 'Vikram Reddy',
+      message: "Finding reliable supplements has always been a challenge for me, but Supplement Adda has made it easy. Their product selection is impressive, and I've noticed a marked improvement in my performance since I started using their products. A trustworthy brand!",
+    },
+    {
+      name: 'Sneha Joshi',
+      message: "Supplement Adda is my secret weapon for fitness success! Their supplements work wonders, and the customer service is second to none. I appreciate their commitment to quality and their dedication to customer satisfaction.",
+    },
+    {
+      name: 'Karan Singh',
+      message: "I've been a loyal customer of Supplement Adda for over a year now, and I couldn't be happier. Their high-quality supplements and excellent customer service have kept me coming back. I'm always excited to try their new products!",
+    },
+    {
+      name: 'Pooja Bansal',
+      message: "Supplement Adda has changed the way I view supplements. Their products are effective, affordable, and the customer support team is always there to help. I'm grateful for such a reliable partner in my fitness journey.",
+    },
   ];
 
   return (

@@ -11,7 +11,7 @@ function UpdateProduct() {
     const { products, setProducts, updateProduct } = context;
 
     const [uploading, setUploading] = useState(false);
-    const [uploadProgress, setUploadProgress] = useState(0);
+    const [uploadProgress, setUploadProgress] = useState({});
     const [imageUploaded, setImageUploaded] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
@@ -31,7 +31,8 @@ function UpdateProduct() {
         });
     };
 
-    const handleImageUpload = (file) => {
+    // Handle image upload for a specific index (for replacing images)
+    const handleImageUpload = (file, index) => {
         if (!file) return;
 
         const storageRef = ref(storage, `images/${file.name}`);
@@ -42,7 +43,10 @@ function UpdateProduct() {
         uploadTask.on('state_changed',
             (snapshot) => {
                 const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                setUploadProgress(progress);
+                setUploadProgress((prevProgress) => ({
+                    ...prevProgress,
+                    [index]: progress
+                }));
             },
             (error) => {
                 setErrorMessage("Image upload failed. Please try again.");
@@ -50,7 +54,11 @@ function UpdateProduct() {
             },
             () => {
                 getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-                    setProducts({ ...products, imageUrl: downloadURL });
+                    // Replace the image URL at the specific index
+                    const updatedImageUrls = [...products.imageUrls];
+                    updatedImageUrls[index] = downloadURL;
+
+                    setProducts({ ...products, imageUrls: updatedImageUrls });
                     setImageUploaded(true);
                     setUploading(false);
                     setErrorMessage('Image successfully uploaded!');
@@ -59,31 +67,21 @@ function UpdateProduct() {
         );
     };
 
-    const handleRemoveFlavor = (index) => {
-        const updatedFlavors = flavors.filter((_, i) => i !== index);
-        setFlavors(updatedFlavors);
-    };
-
     const handleUpdateProduct = () => {
-        // Log the products object to debug the issue
         console.log('Products:', products);
 
-        // Check if all required fields are filled
         if (!products.title || !products.price1 || !products.category || !products.description || !products.weight1) {
             setErrorMessage("All fields are required.");
             return;
         }
 
-        // Check if the image URL or uploaded image is provided
-        if (!products.imageUrl && !imageUploaded) {
-            setErrorMessage("Please provide an image URL or upload an image.");
+        if (!products.imageUrls || products.imageUrls.length === 0) {
+            setErrorMessage("Please provide at least one image.");
             return;
         }
 
-        // Add flavors to the product object before updating
         const updatedProduct = { ...products, flavors };
 
-        // Proceed to update the product if all validations pass
         updateProduct(updatedProduct).then(() => {
             setSuccessMessage('Product successfully updated!');
             setTimeout(() => {
@@ -112,6 +110,8 @@ function UpdateProduct() {
                             placeholder='Product Name'
                         />
                     </div>
+
+                    {/* Other product fields */}
                     <div>
                         <input
                             type="text"
@@ -129,105 +129,97 @@ function UpdateProduct() {
                             onChange={handleInputChange}
                             value={products.price2 || ""}
                             className='bg-gray-700 px-4 py-3 w-full rounded-lg text-white placeholder:text-gray-300 outline-none'
-                            placeholder='Product price 2'
+                            placeholder='Product price 1'
                         />
                     </div>
-                    <input
-  type="text" // Using text type to allow for number + unit
-  name="weight1"
-  onChange={handleInputChange}
-  value={products.weight1 || ""}
-  className="bg-gray-600 mb-4 px-4 py-2 w-full rounded-lg text-white placeholder:text-gray-200 outline-none"
-  placeholder="e.g. 100g, 1kg" // Give users an example of expected input
-/>
-
-               <input
-  type="text" // Using text type to allow for number + unit
-  name="weight2"
-  onChange={handleInputChange}
-  value={products.weight2 || ""}
-  className="bg-gray-600 mb-4 px-4 py-2 w-full rounded-lg text-white placeholder:text-gray-200 outline-none"
-  placeholder="e.g. 100g, 1kg" // Give users an example of expected input
-/>
-
+                    
+                    
+                    {/* Display existing images with option to replace */}
+                    <div className='mt-4'>
+                        <h2 className='text-white font-semibold mb-2'>Product Images</h2>
+                        {products.imageUrls && products.imageUrls.map((imageUrl, index) => (
+                            <div key={index} className='mb-4'>
+                                <img src={imageUrl} alt={`Product ${index + 1}`} className='w-full h-40 object-cover rounded-md mb-2' />
+                                <input
+                                    type="file"
+                                    onChange={(e) => handleImageUpload(e.target.files[0], index)}
+                                    className='bg-gray-700 px-4 py-3 w-full rounded-lg text-white placeholder:text-gray-300 outline-none'
+                                />
+                                {uploading && uploadProgress[index] && (
+                                    <div className="text-yellow-500 mt-2">Uploading image {index + 1}... {uploadProgress[index].toFixed(0)}%</div>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                    <div>
                     <div>
                         <input
                             type="file"
-                            name='image'
-                            onChange={(e) => handleImageUpload(e.target.files[0])}
+                            multiple
+                            onChange={(e) => handleImageUpload(e.target.files[0])} // Handle multiple uploads if needed
                             className='bg-gray-700 px-4 py-3 w-full rounded-lg text-white placeholder:text-gray-300 outline-none'
                         />
-                        {uploading && <div className="text-yellow-500 mt-2">Uploading image... {uploadProgress.toFixed(0)}%</div>}
-                        {imageUploaded && <div className="text-green-500 mt-2">Image successfully uploaded!</div>}
                     </div>
-                    <div>
-                        <input
-                            type="text"
-                            name='imageUrl'
-                            onChange={handleInputChange}
-                            value={products.imageUrl || ""}
-                            className='bg-gray-700 px-4 py-3 w-full rounded-lg text-white placeholder:text-gray-300 outline-none'
-                            placeholder='Product image URL (optional if uploaded)'
-                        />
-                    </div>
-                    <div>
-                        <input
-                            type="text"
-                            name='category'
-                            onChange={handleInputChange}
-                            value={products.category || ""}
-                            className='bg-gray-700 px-4 py-3 w-full rounded-lg text-white placeholder:text-gray-300 outline-none'
-                            placeholder='Product category'
-                        />
-                    </div>
-                    <div>
-                        <textarea
-                            cols="30"
-                            rows="5"
-                            name='description'
-                            onChange={handleInputChange}
-                            value={products.description || ""}
-                            className='bg-gray-700 px-4 py-3 w-full rounded-lg text-white placeholder:text-gray-300 outline-none'
-                            placeholder='Product Description'>
-                        </textarea>
-                    </div>
-
-                    {/* Flavours Dropdowns */}
-                    <div>
                     <input
-                            type="text"
-                            name='flavour1'
-                            onChange={handleInputChange}
-                            value={products.flavour1 || ""}
-                            className='bg-gray-700 px-4 py-3 w-full rounded-lg text-white placeholder:text-gray-300 outline-none'
-                            placeholder='Product flavour1'
-                        />
-                         <input
-                            type="text"
-                            name='flavour2'
-                            onChange={handleInputChange}
-                            value={products.flavour2 || ""}
-                            className='bg-gray-700 px-4 py-3 w-full rounded-lg text-white placeholder:text-gray-300 outline-none'
-                            placeholder='Product flavour2'
-                        />
-                        
-                    </div>
+type="text" // Using text type to allow for number + unit
+name="weight1"
+onChange={handleInputChange}
+value={products.weight1 || ""}
+className="bg-gray-600 mb-4 px-4 py-2 w-full rounded-lg text-white placeholder:text-gray-200 outline-none"
+placeholder="e.g. 100g, 1kg" // Give users an example of expected input
+/>
 
-                    {/* Display added flavors with a remove button */}
-                    <ul className="mt-4 space-y-2">
-                        {flavors.map((flavor, index) => (
-                            <li key={index} className="text-white flex justify-between items-center">
-                                {flavor}
-                                <button
-                                    type="button"
-                                    onClick={() => handleRemoveFlavor(index)}
-                                    className="bg-red-600 px-2 py-1 text-white rounded"
-                                >
-                                    Remove
-                                </button>
-                            </li>
-                        ))}
-                    </ul>
+           <input
+type="text" // Using text type to allow for number + unit
+name="weight2"
+onChange={handleInputChange}
+value={products.weight2 || ""}
+className="bg-gray-600 mb-4 px-4 py-2 w-full rounded-lg text-white placeholder:text-gray-200 outline-none"
+placeholder="e.g. 100g, 1kg" // Give users an example of expected input
+/>
+
+<input
+  type="text"
+  name='category'
+  onChange={handleInputChange}
+  value={products.category || ""}
+  className='bg-gray-700 px-4 py-3 w-full rounded-lg text-white placeholder:text-gray-300 outline-none'
+  placeholder='Product category'
+/>
+</div>
+<div>
+<textarea
+  cols="30"
+  rows="5"
+  name='description'
+  onChange={handleInputChange}
+  value={products.description || ""}
+  className='bg-gray-700 px-4 py-3 w-full rounded-lg text-white placeholder:text-gray-300 outline-none'
+  placeholder='Product Description'>
+</textarea>
+</div>
+                    <div>
+<input
+  type="text"
+  name='flavour1'
+  onChange={handleInputChange}
+  value={products.flavour1 || ""}
+  className='bg-gray-700 px-4 py-3 w-full rounded-lg text-white placeholder:text-gray-300 outline-none'
+  placeholder='Product flavour1'
+/>
+<input
+  type="text"
+  name='flavour2'
+  onChange={handleInputChange}
+  value={products.flavour2 || ""}
+  className='bg-gray-700 px-4 py-3 w-full rounded-lg text-white placeholder:text-gray-300 outline-none'
+  placeholder='Product flavour2'
+/>
+
+</div>
+
+                    {/* Add more images (optional) */}
+                  
 
                     <button
                         type='button'
