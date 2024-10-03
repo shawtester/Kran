@@ -136,7 +136,7 @@ export default function Navbar() {
                           to="/category/Isolated"
                           className="text-gray-600 block hover:text-red-500 transition duration-300 font-bold"
                         >
-                          Whey Isolated
+                          Whey Isolate
                         </Link>
                         <Link
                           to="/category/Gainers"
