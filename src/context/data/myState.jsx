@@ -128,7 +128,7 @@ function MyState(props) {
         setLoading(false)
       });
       setOrder(ordersArray);
-      console.log(ordersArray)
+      
       setLoading(false);
     } catch (error) {
       console.log(error)
@@ -147,7 +147,7 @@ function MyState(props) {
         setLoading(false)
       });
       setUser(usersArray);
-      console.log(usersArray)
+      
       setLoading(false);
     } catch (error) {
       console.log(error)

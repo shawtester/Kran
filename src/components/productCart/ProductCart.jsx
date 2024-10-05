@@ -45,8 +45,7 @@ const ProductCart = ({ category }) => {
         categorizedProducts[productCategory].push(product);
       });
       
-      // Log the products by category in the console
-      console.log('Products categorized by category:', categorizedProducts);
+      
   
       setProducts(allProducts);
       
