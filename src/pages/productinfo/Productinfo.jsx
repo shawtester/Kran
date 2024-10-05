@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { doc, getDoc } from 'firebase/firestore';
+import { fireDB } from '../../firebase/FirebaseConfig';
+import Layout from '../../components/layout/Layout';
 import { useDispatch } from 'react-redux';
 import { addToCart } from '../../redux/cartSlice';
-import Layout from '../../components/layout/Layout';
-import { fireDB } from '../../firebase/FirebaseConfig';
-import { doc, getDoc } from 'firebase/firestore';
+import './Product.css'; // External CSS for the zoom box
 
 function ProductInfo() {
   const { id } = useParams();
@@ -13,7 +14,8 @@ function ProductInfo() {
   const [selectedWeight, setSelectedWeight] = useState(localStorage.getItem(`selectedWeight-${id}`) || null);
   const [selectedFlavor, setSelectedFlavor] = useState(localStorage.getItem(`selectedFlavor-${id}`) || null);
   const [mainImage, setMainImage] = useState(null);
-  const [showFullDescription, setShowFullDescription] = useState(false);
+  const [zoomVisible, setZoomVisible] = useState(false);
+  const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 });
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -68,17 +70,30 @@ function ProductInfo() {
     localStorage.setItem(`selectedFlavor-${id}`, flavor);
   };
 
-  const handleImageClick = (image) => {
-    setMainImage(image);
+  const handleMouseEnter = () => {
+    setZoomVisible(true);
   };
 
-  const toggleDescription = () => {
-    setShowFullDescription(!showFullDescription);
+  const handleMouseLeave = () => {
+    setZoomVisible(false);
+  };
+
+  const handleMouseMove = (e) => {
+    const { left, top, width, height } = e.target.getBoundingClientRect();
+    const x = ((e.pageX - left) / width) * 100;
+    const y = ((e.pageY - top) / height) * 100;
+    setZoomPosition({ x, y });
+  };
+
+  const handleTouchMove = (e) => {
+    const touch = e.touches[0];
+    const { left, top, width, height } = e.target.getBoundingClientRect();
+    const x = ((touch.pageX - left) / width) * 100;
+    const y = ((touch.pageY - top) / height) * 100;
+    setZoomPosition({ x, y });
   };
 
   if (!product) return <p>Loading...</p>;
-
-  const isDescriptionLong = product.description.length > 500;
 
   return (
     <Layout>
@@ -97,24 +112,47 @@ function ProductInfo() {
           <div className="lg:w-4/5 mx-auto flex flex-wrap flex-col md:flex-row">
             {/* Left Side with Main Image */}
             <div className="md:w-1/2 w-full flex flex-col items-center">
-              {/* Main Image Container */}
-              <div className="relative w-full h-auto md:w-[700px] md:h-[500px] max-w-full flex items-start justify-center mb-4 mt-6 md:mt-0">
+              <div
+                className="relative w-full h-auto md:w-[500px] md:h-[500px] max-w-full flex items-center justify-center mb-4 mt-6 md:mt-0"
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
+                onMouseMove={handleMouseMove}
+                onTouchMove={handleTouchMove}  // For mobile zoom handling
+                onTouchStart={handleMouseEnter}  // Show zoom on touch start
+                onTouchEnd={handleMouseLeave}    // Hide zoom on touch end
+              >
                 <img
                   src={mainImage}
                   alt={product.title}
                   className="object-contain w-full h-full max-w-full max-h-full rounded-md border-4 border-gray-300"
                 />
+
+                {/* Zoomed Image beside the main image */}
+                {zoomVisible && (
+                  <div className="absolute right-0 top-0 md:ml-4 bg-white border border-gray-300 p-2 shadow-lg zoom-container">
+                    <div
+                      style={{
+                        backgroundImage: `url(${mainImage})`,
+                        backgroundPosition: `${zoomPosition.x}% ${zoomPosition.y}%`,
+                        backgroundSize: '250%', // Increase to zoom in more
+                        width: '300px',  // Adjust width of the zoom box
+                        height: '300px', // Adjust height of the zoom box
+                      }}
+                      className="zoom-box"
+                    ></div>
+                  </div>
+                )}
               </div>
 
-              {/* Thumbnail Images Container */}
+              {/* Thumbnail Images */}
               <div className="flex space-x-2 overflow-x-auto">
                 {product.imageUrls?.map((image, index) => (
                   <img
                     key={index}
                     src={image}
                     alt={`Product Image ${index + 1}`}
-                    className="object-cover:contain w-48 h-48 cursor-pointer mb-1 border border-gray-300 rounded-md hover:opacity-75 transition duration-300"
-                    onClick={() => handleImageClick(image)}
+                    className="object-cover w-48 h-48 cursor-pointer mb-1 border border-gray-300 rounded-md hover:opacity-75 transition duration-300"
+                    onClick={() => setMainImage(image)}
                   />
                 ))}
               </div>
@@ -124,19 +162,7 @@ function ProductInfo() {
             <div className="md:w-1/2 w-full md:pl-10 flex flex-col">
               <h2 className="text-sm title-font text-gray-500 tracking-widest">{product.brand}</h2>
               <h1 className="text-gray-900 text-2xl md:text-3xl title-font font-medium mb-1">{product.title}</h1>
-
-              {/* Description with "Read More" button */}
-              <p className={`leading-relaxed border-b-2 mb-5 pb-5 text-sm md:text-base ${showFullDescription ? '' : 'max-h-36 overflow-hidden'}`}>
-                {product.description}
-              </p>
-              {isDescriptionLong && (
-                <button
-                  onClick={toggleDescription}
-                  className="text-indigo-500 text-sm hover:underline"
-                >
-                  {showFullDescription ? 'Read Less' : 'Read More'}
-                </button>
-              )}
+              <p className="leading-relaxed border-b-2 mb-5 pb-5">{product.description}</p>
 
               <div className="flex items-center mb-4">
                 <span className="title-font font-medium text-xl md:text-2xl text-gray-900">₹{product.price1}</span>
@@ -191,10 +217,21 @@ function ProductInfo() {
                 </div>
               </div>
 
-              {/* Add to Cart Button */}
+              {/* Quantity Selector */}
+              <div className="mb-4">
+                <h3 className="text-lg font-medium text-gray-700">Quantity:</h3>
+                <input
+                  type="number"
+                  value={quantity}
+                  onChange={(e) => setQuantity(Number(e.target.value))}
+                  min="1"
+                  className="w-16 border border-gray-300 rounded-md p-2"
+                />
+              </div>
+
               <button
                 onClick={handleAddToCart}
-                className="bg-indigo-500 text-white py-2 px-4 rounded hover:bg-indigo-600 transition duration-200"
+                className="flex items-center justify-center text-white bg-indigo-500 border-0 py-2 px-6 focus:outline-none hover:bg-indigo-600 rounded"
               >
                 Add to Cart
               </button>

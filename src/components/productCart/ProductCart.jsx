@@ -28,13 +28,27 @@ const ProductCart = ({ category }) => {
       const productQuery = category
         ? query(collection(fireDB, "products"), where("category", "==", category))
         : query(collection(fireDB, "products"));
+        
       const querySnapshot = await getDocs(productQuery);
       const allProducts = querySnapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
       }));
-      setProducts(allProducts);
+  
+      // Log products by category
+      const categorizedProducts = {};
+      allProducts.forEach((product) => {
+        const productCategory = product.category || 'Uncategorized'; // Handle products without category
+        if (!categorizedProducts[productCategory]) {
+          categorizedProducts[productCategory] = [];
+        }
+        categorizedProducts[productCategory].push(product);
+      });
       
+      // Log the products by category in the console
+      console.log('Products categorized by category:', categorizedProducts);
+  
+      setProducts(allProducts);
       
     } catch (error) {
       console.error("Error fetching products:", error.message);
@@ -43,6 +57,7 @@ const ProductCart = ({ category }) => {
       setLoading(false);
     }
   };
+  
 
   useEffect(() => {
    
@@ -90,7 +105,7 @@ const ProductCart = ({ category }) => {
 
   const settings = {
     dots: false,
-    infinite: false,
+    infinite: true,
     speed: 500,
     slidesToShow: 4,
     slidesToScroll: 1,

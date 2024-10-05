@@ -5,14 +5,12 @@ import 'swiper/swiper-bundle.css'; // Import Swiper styles
 import './certi.css'; // Import custom styles
 
 // Import local images
-import cert1 from '../../assets/certificates/certificate1.jpg';
-import cert2 from '../../assets/certificates/certificate2.jpg';
+
 import cert3 from '../../assets/certificates/certificate3.jpg';
 
 // Sample certificate data
 const certificates = [
-  { id: 1, title: 'Certificate of Achievement', img: cert1 },
-  { id: 2, title: 'Certificate of Excellence', img: cert2 },
+ 
   { id: 3, title: 'Certificate of Excellence', img: cert3 },
 ];
 

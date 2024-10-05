@@ -1,0 +1,36 @@
+.slide-left {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  
+  img {
+    transition: transform 0.9s ease-in-out, opacity 0.9s ease-in-out;
+  }
+  
+
+
+.zoom-container {
+  width: 300px; /* Adjust the width */
+  height: 300px; /* Adjust the height */
+  overflow: hidden;
+  border: 2px solid #ccc; /* Optional: Border around zoom box */
+  background-color: white; /* Optional: Background color */
+}
+
+.zoom-box {
+  background-repeat: no-repeat;
+  background-size: 250%; /* Adjust zoom level (increase for more zoom) */
+  transition: background-position 0.1s ease-out;
+}
+
+/* Responsive adjustments for mobile devices */
+@media (max-width: 768px) {
+  .zoom-container {
+    width: 200px; /* Smaller width on mobile */
+    height: 200px; /* Smaller height on mobile */
+  }
+
+  .zoom-box {
+    background-size: 200%; /* Adjust zoom level for mobile */
+  }
+}

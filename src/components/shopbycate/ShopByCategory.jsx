@@ -9,6 +9,14 @@ import CategoryImage2 from '../../assets/Images/Category2.png';
 import CategoryImage3 from '../../assets/Images/Category3.png';
 import CategoryImage4 from '../../assets/Images/Category4.png';
 import CategoryImage5 from '../../assets/Images/Category5.png';
+import CategoryImage6 from '../../assets/Images/Category6.png';
+import CategoryImage7 from '../../assets/Images/Category7.png';
+import CategoryImage8 from '../../assets/Images/Category8.png';
+import CategoryImage9 from '../../assets/Images/Category9.png';
+import CategoryImage10 from '../../assets/Images/Category10.png';
+import CategoryImage11 from '../../assets/Images/Category11.png';
+
+
 
 const categories = [
   {
@@ -17,9 +25,9 @@ const categories = [
     route: '/category/Whey',
   },
   {
-    title: 'Isolated',
+    title: 'Whey-Isolate',
     imageUrl: CategoryImage2,
-    route: '/category/Isolated',
+    route: '/category/Whey-Isolate',
   },
   {
     title: 'Creatine',
@@ -28,13 +36,43 @@ const categories = [
   },
   {
     title: 'Pre-Workout',
-    imageUrl: CategoryImage3,
+    imageUrl: CategoryImage5,
     route: '/category/Pre-Workout',
   },
   {
     title: 'Gainers',
-    imageUrl: CategoryImage5,
+    imageUrl: CategoryImage3,
     route: '/category/Gainers',
+  },
+  {
+    title: 'Omega3',
+    imageUrl: CategoryImage6,
+    route: '/category/Omega3',
+  },
+  {
+    title: 'BCAA-Aminos',
+    imageUrl: CategoryImage7,
+    route: '/category/BCAA-Aminos',
+  },
+  {
+    title: 'Weight-Loss',
+    imageUrl: CategoryImage8,
+    route: '/category/Weight-Loss',
+  },
+  {
+    title: 'Multi-Vitamins',
+    imageUrl: CategoryImage9,
+    route: '/category/Multi-Vitamins',
+  },
+  {
+    title: 'Glutamine',
+    imageUrl: CategoryImage10,
+    route: '/category/Glutamine',
+  },
+  {
+    title: 'Nitrix-Oxide',
+    imageUrl: CategoryImage11,
+    route: '/category/Nitrix-Oxide',
   },
   // Add more categories as needed
 ];
